@@ -47,3 +47,115 @@
     <% } %>
   </div>
 </div>
+
+<!-- 🎨 WIDGET FLOTANT STOCK EN BAS -->
+<div class="floating-stock-widget">
+  <button class="widget-toggle" onclick="toggleStockWidget()">
+    <i class="fas fa-boxes"></i>
+    <span class="widget-badge"><%= produits.length %></span>
+  </button>
+  
+  <div class="stock-widget-content" id="stockWidget">
+    <div class="widget-header">
+      <h3><i class="fas fa-boxes"></i> Résumé des Stocks</h3>
+      <button class="close-btn" onclick="toggleStockWidget()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="widget-body">
+      <!-- STATS GLOBALES -->
+      <div class="stock-stats-grid">
+        <div class="stock-stat-mini">
+          <div class="stat-mini-icon"><i class="fas fa-plus-circle"></i></div>
+          <div class="stat-mini-value" id="totalEntree">0</div>
+          <div class="stat-mini-label">Entrée Stock</div>
+        </div>
+        <div class="stock-stat-mini">
+          <div class="stat-mini-icon"><i class="fas fa-minus-circle"></i></div>
+          <div class="stat-mini-value" id="totalSortie">0</div>
+          <div class="stat-mini-label">Sortie Stock</div>
+        </div>
+        <div class="stock-stat-mini">
+          <div class="stat-mini-icon"><i class="fas fa-package"></i></div>
+          <div class="stat-mini-value" id="totalRestant">0</div>
+          <div class="stat-mini-label">Stock Restant</div>
+        </div>
+      </div>
+      
+      <!-- LISTE PRODUITS -->
+      <div class="widget-products-list">
+        <% produits.forEach((p, index) => { %>
+        <div class="product-stock-item" data-id="<%= p.id %>">
+          <div class="product-stock-header">
+            <div class="product-info">
+              <% if (p.image) { %>
+                <img src="<%= p.image %>" alt="<%= p.nom %>" class="product-thumb">
+              <% } else { %>
+                <div class="product-thumb-placeholder"><i class="fas fa-box"></i></div>
+              <% } %>
+              <div class="product-details">
+                <strong><%= p.nom %></strong>
+                <small><%= p.reference %></small>
+              </div>
+            </div>
+            <% if (p.alerte) { %>
+              <span class="badge badge-danger">⚠️ ALERTE</span>
+            <% } else { %>
+              <span class="badge badge-success">✅ OK</span>
+            <% } %>
+          </div>
+          
+          <div class="product-stock-bars">
+            <div class="stock-bar-item">
+              <div class="stock-bar-label">Disponible</div>
+              <div class="stock-bar" style="background: linear-gradient(90deg, #7CB342, #4A7C59);">
+                <span class="stock-value"><%= p.stock %></span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="product-stock-footer">
+            <small>Seuil: <%= p.seuil_alerte %></small>
+            <small>PV: <%= p.prix_vente %> FCFA</small>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleStockWidget() {
+  const widget = document.getElementById('stockWidget');
+  widget.classList.toggle('show');
+}
+
+// Calculer les statistiques globales
+const produits = <%- JSON.stringify(produits) %>;
+let totalEntree = 0, totalSortie = 0, totalRestant = 0;
+
+produits.forEach(p => {
+  totalRestant += p.stock || 0;
+});
+
+// Simuler les données (en production, venir du serveur)
+totalEntree = produits.reduce((sum, p) => sum + (p.stock || 0), 0) + Math.floor(Math.random() * 50);
+totalSortie = Math.floor(Math.random() * 30);
+
+document.getElementById('totalEntree').textContent = totalEntree;
+document.getElementById('totalSortie').textContent = totalSortie;
+document.getElementById('totalRestant').textContent = totalRestant;
+
+// Fermer le widget en cliquant à l'extérieur
+document.addEventListener('click', (e) => {
+  const widget = document.querySelector('.floating-stock-widget');
+  if (!widget.contains(e.target)) {
+    const content = document.getElementById('stockWidget');
+    if (content && content.classList.contains('show')) {
+      content.classList.remove('show');
+    }
+  }
+});
+</script>
