@@ -59,10 +59,11 @@ async function initDB() {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`);
 
-    // TABLE MOUVEMENTS STOCK
+    // TABLE MOUVEMENTS STOCK (avec catégories incluant BRIS)
     await dbRun(`CREATE TABLE IF NOT EXISTS mouvements_stock (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       type TEXT NOT NULL,
+      categorie TEXT DEFAULT 'normal',
       produit_id INTEGER NOT NULL,
       quantite INTEGER NOT NULL,
       prix_vente_effectif REAL,
