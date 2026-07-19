@@ -52,13 +52,13 @@ app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ============================================================================
-// SESSIONS
+// SESSIONS - AVEC PERSISTENCE POUR ÉVITER PERTE DE DONNÉES
 // ============================================================================
 const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
 
 app.use(session({
   secret: SESSION_SECRET,
-  resave: false,
+  resave: true,  // 🔥 CHANGE: true au lieu de false - PERSISTE LA SESSION
   saveUninitialized: true,
   cookie: {
     httpOnly: true,
@@ -91,7 +91,7 @@ async function logAction(userId, action, description) {
 async function getStock(produitId) {
   const row = await dbGet(`
     SELECT COALESCE(SUM(CASE WHEN type IN ('entree','ajustement') THEN quantite ELSE 0 END),0) -
-           COALESCE(SUM(CASE WHEN type IN ('sortie','vente') THEN quantite ELSE 0 END),0) as stock
+           COALESCE(SUM(CASE WHEN type IN ('sortie','vente','bris') THEN quantite ELSE 0 END),0) as stock
     FROM mouvements_stock WHERE produit_id = ?`, [produitId]);
   return row ? row.stock : 0;
 }
@@ -153,6 +153,9 @@ app.post('/login', async (req, res) => {
       return res.redirect('/login');
     }
     req.session.user = { id: user.id, email: user.email, role: user.role };
+    req.session.save((err) => {
+      if (err) console.error('Session save error:', err);
+    });
     await logAction(user.id, 'Connexion', `Connexion via ${email}`);
     req.session.flash = { type: 'success', message: `Bienvenue ${user.email}!` };
     res.redirect('/dashboard');
@@ -418,9 +421,11 @@ app.post('/stock/sortie', requireAuth, async (req, res) => {
     }
     
     const dateMvt = date_mouvement || new Date().toISOString();
-    await dbRun(`INSERT INTO mouvements_stock (type, produit_id, quantite, date_mouvement, user_id, commentaire)
-      VALUES (?, ?, ?, ?, ?, ?)`,
-      ['sortie', produit_id, qte, dateMvt, req.session.user.id, `${motif || 'Autre'} - ${commentaire || ''}`]);
+    // 🔥 CHANGE: utilise categorie="bris" si motif est "Bris"
+    const categorie = motif === 'Bris' ? 'bris' : 'sortie';
+    await dbRun(`INSERT INTO mouvements_stock (type, categorie, produit_id, quantite, date_mouvement, user_id, commentaire)
+      VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [categorie === 'bris' ? 'bris' : 'sortie', categorie, produit_id, qte, dateMvt, req.session.user.id, `${motif || 'Autre'} - ${commentaire || ''}`]);
     
     const produit = await dbGet('SELECT nom FROM produits WHERE id = ?', [produit_id]);
     await logAction(req.session.user.id, 'Sortie stock', `${produit.nom} -${qte} (${motif})`);
