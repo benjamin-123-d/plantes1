@@ -1,0 +1,114 @@
+<h1 class="page-title"><i class="fas fa-wallet"></i> Gestion de la Caisse</h1>
+
+<div class="page-content">
+  <div class="card balance-card">
+    <div class="balance-header">
+      <h2>Solde actuel</h2>
+      <div class="balance-amount"><%= solde.toLocaleString('fr-FR') %> FCFA</div>
+    </div>
+  </div>
+
+  <% if (user && user.role === 'admin') { %>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="openTab(event, 'entree')">Entrée Caisse</button>
+    <button class="tab-btn" onclick="openTab(event, 'sortie')">Sortie Caisse</button>
+    <button class="tab-btn" onclick="openTab(event, 'historique')">Historique</button>
+  </div>
+
+  <!-- ENTREE -->
+  <div id="entree" class="tab-content active">
+    <div class="card" style="max-width: 600px;">
+      <h3>Enregistrer une entrée</h3>
+      <form method="POST" action="/caisse/entree">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="form-group">
+          <label class="form-label">Montant (FCFA) *</label>
+          <input type="number" name="montant" class="form-control" min="0" step="0.01" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Motif *</label>
+          <input type="text" name="motif" class="form-control" placeholder="ex: Prêt, Remboursement..." required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Commentaire</label>
+          <textarea name="commentaire" class="form-control" rows="2"></textarea>
+        </div>
+        <button type="submit" class="btn btn-success btn-block"><i class="fas fa-plus"></i> Enregistrer entrée</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- SORTIE -->
+  <div id="sortie" class="tab-content">
+    <div class="card" style="max-width: 600px;">
+      <h3>Enregistrer une sortie</h3>
+      <form method="POST" action="/caisse/sortie">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="form-group">
+          <label class="form-label">Montant (FCFA) *</label>
+          <input type="number" name="montant" class="form-control" min="0" step="0.01" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Motif *</label>
+          <input type="text" name="motif" class="form-control" placeholder="ex: Dépense, Salaire..." required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Commentaire</label>
+          <textarea name="commentaire" class="form-control" rows="2"></textarea>
+        </div>
+        <button type="submit" class="btn btn-warning btn-block"><i class="fas fa-minus"></i> Enregistrer sortie</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- HISTORIQUE -->
+  <div id="historique" class="tab-content">
+    <div class="card">
+      <h3>Historique des mouvements</h3>
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Montant</th>
+            <th>Motif</th>
+            <th>Utilisateur</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% historique.forEach(h => { %>
+          <tr>
+            <td><small><%= new Date(h.date_mouvement).toLocaleString('fr-FR') %></small></td>
+            <td>
+              <% if (h.type === 'entree') { %>
+                <span class="badge badge-success">+ ENTREE</span>
+              <% } else { %>
+                <span class="badge badge-danger">- SORTIE</span>
+              <% } %>
+            </td>
+            <td><strong><%= h.montant.toLocaleString('fr-FR') %> FCFA</strong></td>
+            <td><%= h.motif %></td>
+            <td><small><%= h.user_email || 'Système' %></small></td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <% } else { %>
+  <div class="card">
+    <p class="text-center"><i class="fas fa-lock"></i> Accès réservé à l'administrateur</p>
+  </div>
+  <% } %>
+</div>
+
+<script>
+  function openTab(evt, tabName) {
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabContents.forEach(tab => tab.classList.remove('active'));
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    tabBtns.forEach(btn => btn.classList.remove('active'));
+    document.getElementById(tabName).classList.add('active');
+    evt.currentTarget.classList.add('active');
+  }
+</script>

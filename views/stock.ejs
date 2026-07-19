@@ -1,0 +1,143 @@
+<h1 class="page-title"><i class="fas fa-box"></i> Gestion du Stock</h1>
+
+<div class="page-content">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="openTab(event, 'entree')">Entrée Stock</button>
+    <button class="tab-btn" onclick="openTab(event, 'sortie')">Sortie Stock</button>
+  </div>
+
+  <!-- TAB ENTREE -->
+  <div id="entree" class="tab-content active">
+    <div class="card" style="max-width: 600px;">
+      <h2>Ajouter une entrée de stock</h2>
+      <form method="POST" action="/stock/entree">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        
+        <div class="form-group">
+          <label class="form-label">Produit *</label>
+          <select name="produit_id" class="form-control" required>
+            <option value="">-- Sélectionner --</option>
+            <% produits.forEach(p => { %>
+            <option value="<%= p.id %>"><%= p.nom %> (Stock: <%= p.stock %>)</option>
+            <% }); %>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Quantité *</label>
+          <input type="number" name="quantite" class="form-control" min="1" value="1" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Prix d'achat unitaire</label>
+          <input type="number" name="prix_achat_unitaire" class="form-control" min="0" step="0.01">
+        </div>
+
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" name="payer_caisse" value="1">
+            Payer depuis la caisse
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Commentaire</label>
+          <textarea name="commentaire" class="form-control" rows="2"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-success btn-block">
+          <i class="fas fa-plus"></i> Enregistrer entrée
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- TAB SORTIE -->
+  <div id="sortie" class="tab-content">
+    <div class="card" style="max-width: 600px;">
+      <h2>Enregistrer une sortie de stock</h2>
+      <form method="POST" action="/stock/sortie">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        
+        <div class="form-group">
+          <label class="form-label">Produit *</label>
+          <select name="produit_id" class="form-control" required>
+            <option value="">-- Sélectionner --</option>
+            <% produits.forEach(p => { %>
+            <option value="<%= p.id %>"><%= p.nom %> (Stock: <%= p.stock %>)</option>
+            <% }); %>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Quantité *</label>
+          <input type="number" name="quantite" class="form-control" min="1" value="1" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Motif *</label>
+          <select name="motif" class="form-control" required>
+            <option value="">-- Sélectionner --</option>
+            <option value="Casse">Casse</option>
+            <option value="Perte">Perte</option>
+            <option value="Retour">Retour</option>
+            <option value="Don">Don</option>
+            <option value="Autre">Autre</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Commentaire</label>
+          <textarea name="commentaire" class="form-control" rows="2"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-warning btn-block">
+          <i class="fas fa-minus"></i> Enregistrer sortie
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <h2 style="margin-top: 40px;">État actuel du stock</h2>
+  <div class="card">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Produit</th>
+          <th>Référence</th>
+          <th>Stock</th>
+          <th>Seuil</th>
+          <th>Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% produits.forEach(p => { %>
+        <tr>
+          <td><strong><%= p.nom %></strong></td>
+          <td><small><%= p.reference %></small></td>
+          <td><%= p.stock %></td>
+          <td><%= p.seuil_alerte %></td>
+          <td>
+            <% if (p.alerte) { %>
+              <span class="badge badge-danger">⚠️ Alerte</span>
+            <% } else { %>
+              <span class="badge badge-success">✅ OK</span>
+            <% } %>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  function openTab(evt, tabName) {
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabContents.forEach(tab => tab.classList.remove('active'));
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    tabBtns.forEach(btn => btn.classList.remove('active'));
+    document.getElementById(tabName).classList.add('active');
+    evt.currentTarget.classList.add('active');
+  }
+</script>

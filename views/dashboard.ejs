@@ -1,0 +1,49 @@
+<h1 class="page-title"><i class="fas fa-leaf"></i> Tableau de bord</h1>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon"><i class="fas fa-coins"></i></div>
+    <div class="stat-value"><%= caJour.toLocaleString('fr-FR') %> FCFA</div>
+    <div class="stat-label">CA Aujourd'hui</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+    <div class="stat-value"><%= totalVentes %></div>
+    <div class="stat-label">Ventes totales</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+    <div class="stat-value"><%= solde.toLocaleString('fr-FR') %> FCFA</div>
+    <div class="stat-label">Solde caisse</div>
+  </div>
+</div>
+
+<div class="page-content">
+  <div class="card">
+    <h2>Produits en alerte</h2>
+    <% if (produits.filter(p => p.alerte).length === 0) { %>
+      <p class="text-center text-muted">Tous les stocks sont corrects ✅</p>
+    <% } else { %>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Produit</th>
+            <th>Stock</th>
+            <th>Seuil</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% produits.filter(p => p.alerte).forEach(p => { %>
+          <tr class="alert-row">
+            <td><%= p.nom %></td>
+            <td><strong><%= p.stock %></strong></td>
+            <td><%= p.seuil_alerte %></td>
+            <td><a href="/stock" class="btn btn-sm btn-warning">Réapprovisionner</a></td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    <% } %>
+  </div>
+</div>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartStock - Gestion de Stock & Caisse</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <% if (typeof hideNav === 'undefined' || !hideNav) { %>
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="/dashboard" class="logo">
+        <span class="logo-icon">🌿</span>
+        <span>SmartStock</span>
+      </a>
+      <nav class="header-nav" id="headerNav">
+        <a href="/dashboard"><i class="fas fa-leaf"></i> Tableau</a>
+        <a href="/vente"><i class="fas fa-coins"></i> Vente</a>
+        <a href="/stock"><i class="fas fa-box"></i> Stock</a>
+        <a href="/caisse"><i class="fas fa-wallet"></i> Caisse</a>
+        <% if (user && user.role === 'admin') { %>
+        <a href="/produits"><i class="fas fa-boxes"></i> Produits</a>
+        <% } %>
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+      </nav>
+      <button class="burger-btn" onclick="document.getElementById('headerNav').classList.toggle('open')">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </header>
+  <% } %>
+  <main class="main-container">
+    <%- body %>
+  </main>
+  <div class="toast-container" id="toastContainer"></div>
+  <script>
+    <% if (flash) { %>
+    showToast(`<%= flash.message %>`, '<%= flash.type %>');
+    <% } %>
+    function showToast(msg, type) {
+      const c = document.getElementById('toastContainer');
+      const t = document.createElement('div');
+      t.className = 'toast ' + (type === 'success' ? 'toast-success' : 'toast-error');
+      t.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i><span>${msg}</span>`;
+      c.appendChild(t);
+      setTimeout(() => { t.classList.add('hiding'); setTimeout(() => t.remove(), 300); }, 4000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<h1 class="page-title"><i class="fas fa-boxes"></i> Gestion des Produits</h1>
+
+<div class="page-content">
+  <div class="card" style="margin-bottom: 30px;">
+    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+      <form method="GET" action="/produits" style="flex: 1; display: flex; gap: 10px;">
+        <input type="text" name="q" value="<%= q %>" class="form-control" placeholder="Rechercher un produit...">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Chercher</button>
+      </form>
+      <a href="/produits/nouveau" class="btn btn-success"><i class="fas fa-plus"></i> Nouveau produit</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <% if (produits.length === 0) { %>
+      <p class="text-center text-muted">Aucun produit trouvé</p>
+    <% } else { %>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Référence</th>
+            <th>Nom</th>
+            <th>Stock</th>
+            <th>Prix V.</th>
+            <th>Seuil</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% produits.forEach(p => { %>
+          <tr>
+            <td><small><code><%= p.reference %></code></small></td>
+            <td><strong><%= p.nom %></strong></td>
+            <td><%= p.stock %></td>
+            <td><%= p.prix_vente %> FCFA</td>
+            <td><%= p.seuil_alerte %></td>
+            <td>
+              <% if (p.alerte) { %>
+                <span class="badge badge-warning">⚠️ Alerte</span>
+              <% } else { %>
+                <span class="badge badge-success">✅ OK</span>
+              <% } %>
+            </td>
+            <td>
+              <a href="/produits/<%= p.id %>/edit" class="btn btn-sm btn-info">✎ Éditer</a>
+            </td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    <% } %>
+  </div>
+</div>

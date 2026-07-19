@@ -1,0 +1,63 @@
+<h1 class="page-title"><i class="fas fa-coins"></i> Nouvelle vente</h1>
+
+<div class="page-content">
+  <div class="card" style="max-width: 600px; margin: 0 auto;">
+    <form method="POST" action="/vente">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      
+      <div class="form-group">
+        <label class="form-label">Produit *</label>
+        <input type="text" id="produitSearch" class="form-control" placeholder="Tapez pour chercher..." autocomplete="off">
+        <input type="hidden" name="produit_id" id="produitId" required>
+        <div id="produitDropdown" class="dropdown-list" style="display:none;"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Quantité *</label>
+        <input type="number" name="quantite" class="form-control" min="1" value="1" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Prix vente effectif</label>
+        <input type="number" name="prix_vente_effectif" id="prixVente" class="form-control" min="0" step="0.01">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Commentaire</label>
+        <textarea name="commentaire" class="form-control" rows="2"></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-success btn-block btn-lg">
+        <i class="fas fa-check"></i> Valider la vente
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+  const produits = <%- JSON.stringify(produits) %>;
+  const input = document.getElementById('produitSearch');
+  const dropdown = document.getElementById('produitDropdown');
+  const produitId = document.getElementById('produitId');
+  const prixVente = document.getElementById('prixVente');
+
+  input.addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase();
+    if (!q) { dropdown.style.display = 'none'; return; }
+    const matches = produits.filter(p => p.nom.toLowerCase().includes(q) || p.reference.toLowerCase().includes(q));
+    dropdown.innerHTML = matches.map(p => `
+      <div class="dropdown-item" onclick="selectProduit(${p.id}, '${p.nom}', ${p.prix_vente})">
+        <strong>${p.nom}</strong>
+        <small>Stock: ${p.stock} | ${p.reference}</small>
+      </div>
+    `).join('');
+    dropdown.style.display = matches.length ? 'block' : 'none';
+  });
+
+  function selectProduit(id, nom, prix) {
+    produitId.value = id;
+    input.value = nom;
+    prixVente.value = prix;
+    dropdown.style.display = 'none';
+  }
+</script>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion - SmartStock</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="login-page">
+  <div class="login-container">
+    <div class="login-box">
+      <div class="login-header">
+        <span class="logo-icon">🌿</span>
+        <h1>SmartStock</h1>
+        <p>Gestion de Stock & Caisse</p>
+      </div>
+      
+      <% if (flash) { %>
+      <div class="alert alert-<%= flash.type %>">
+        <i class="fas fa-<%= flash.type === 'success' ? 'check-circle' : 'exclamation-circle' %>"></i>
+        <%= flash.message %>
+      </div>
+      <% } %>
+
+      <form method="POST" action="/login" class="login-form">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" name="email" class="form-control" placeholder="admin@example.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mot de passe</label>
+          <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg">
+          <i class="fas fa-sign-in-alt"></i> Se connecter
+        </button>
+      </form>
+
+      <div class="login-footer">
+        <p><strong>Comptes de test :</strong></p>
+        <small>Admin: admin@example.com / admin123</small><br>
+        <small>Collab: collab@example.com / collab123</small>
+      </div>
+    </div>
+  </div>
+  <script>
+    <% if (flash) { %>
+    showToast(`<%= flash.message %>`, '<%= flash.type %>');
+    <% } %>
+    function showToast(msg, type) {
+      const c = document.getElementById('toastContainer') || document.body;
+      const t = document.createElement('div');
+      t.className = 'toast ' + (type === 'success' ? 'toast-success' : 'toast-error');
+      t.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i><span>${msg}</span>`;
+      c.appendChild(t);
+      setTimeout(() => { t.classList.add('hiding'); setTimeout(() => t.remove(), 300); }, 4000);
+    }
+  </script>
+</body>
+</html>

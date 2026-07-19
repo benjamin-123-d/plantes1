@@ -1,0 +1,44 @@
+<h1 class="page-title"><i class="fas fa-edit"></i> <%= produit ? 'Éditer' : 'Créer' %> un produit</h1>
+
+<div class="page-content">
+  <div class="card" style="max-width: 600px; margin: 0 auto;">
+    <form method="POST" action="/produits" enctype="multipart/form-data">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      
+      <div class="form-group">
+        <label class="form-label">Référence *</label>
+        <input type="text" name="reference" class="form-control" value="<%= produit ? produit.reference : '' %>" placeholder="ex: PROD-001" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nom du produit *</label>
+        <input type="text" name="nom" class="form-control" value="<%= produit ? produit.nom : '' %>" placeholder="ex: Tomate" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Seuil d'alerte *</label>
+        <input type="number" name="seuil_alerte" class="form-control" value="<%= produit ? produit.seuil_alerte : 5 %>" min="1" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Prix d'achat (FCFA)</label>
+        <input type="number" name="prix_achat" class="form-control" value="<%= produit ? produit.prix_achat : 0 %>" min="0" step="0.01">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Prix de vente (FCFA) *</label>
+        <input type="number" name="prix_vente" class="form-control" value="<%= produit ? produit.prix_vente : 0 %>" min="0" step="0.01" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Image du produit</label>
+        <input type="file" name="image" class="form-control" accept="image/*">
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button type="submit" class="btn btn-success flex-1"><i class="fas fa-save"></i> Enregistrer</button>
+        <a href="/produits" class="btn btn-secondary flex-1"><i class="fas fa-times"></i> Annuler</a>
+      </div>
+    </form>
+  </div>
+</div>
